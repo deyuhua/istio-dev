@@ -122,6 +122,33 @@ func NewController(client *Client, options controller2.Options) model.ConfigStor
 	watchedNamespaceList := strings.Split(options.WatchedNamespaces, ",")
 
 	known := knownCrdsWithRetry(client)
+	// 	map[string]struct {} [
+	//         "envoyfilters.networking.istio.io": {},
+	//         "gateways.networking.istio.io": {},
+	//         "handlers.config.istio.io": {},
+	//         "httpapispecbindings.config.istio.io": {},
+	//         "peerauthentications.security.istio.io": {},
+	//         "quotaspecs.config.istio.io": {},
+	//         "servicerolebindings.rbac.istio.io": {},
+	//         "adapters.config.istio.io": {},
+	//         "destinationrules.networking.istio.io": {},
+	//         "serviceentries.networking.istio.io": {},
+	//         "templates.config.istio.io": {},
+	//         "attributemanifests.config.istio.io": {},
+	//         "clusterrbacconfigs.rbac.istio.io": {},
+	//         "istiooperators.install.istio.io": {},
+	//         "requestauthentications.security.istio.io": {},
+	//         "serviceroles.rbac.istio.io": {},
+	//         "workloadentries.networking.istio.io": {},
+	//         "authorizationpolicies.security.istio.io": {},
+	//         "httpapispecs.config.istio.io": {},
+	//         "instances.config.istio.io": {},
+	//         "quotaspecbindings.config.istio.io": {},
+	//         "rbacconfigs.rbac.istio.io": {},
+	//         "rules.config.istio.io": {},
+	//         "sidecars.networking.istio.io": {},
+	//         "virtualservices.networking.istio.io": {},
+	// ]
 	// add stores for CRD kinds
 	for _, s := range client.Schemas().All() {
 		// From the spec: "Its name MUST be in the format <.spec.name>.<.spec.group>."

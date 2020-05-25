@@ -70,7 +70,7 @@ func newEndpointSliceController(c *Controller, options Options) *endpointSliceCo
 		},
 		endpointCache: newEndpointSliceCache(),
 	}
-	registerHandlers(informer, c.queue, "EndpointSlice", out.onEvent)
+	registerHandlers(informer, c.queue, "EndpointSlice", out.onEvent) // NOTE
 	return out
 }
 

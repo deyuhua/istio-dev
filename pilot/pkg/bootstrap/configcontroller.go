@@ -70,12 +70,12 @@ const (
 // initConfigController creates the config controller in the pilotConfig.
 func (s *Server) initConfigController(args *PilotArgs) error {
 	meshConfig := s.environment.Mesh()
-	if len(meshConfig.ConfigSources) > 0 {
+	if len(meshConfig.ConfigSources) > 0 { // empty
 		// Using MCP for config.
 		if err := s.initMCPConfigController(args); err != nil {
 			return err
 		}
-	} else if args.Config.FileDir != "" {
+	} else if args.Config.FileDir != "" { // empty string
 		store := memory.Make(collections.Pilot)
 		configController := memory.NewController(store)
 
@@ -84,21 +84,21 @@ func (s *Server) initConfigController(args *PilotArgs) error {
 			return err
 		}
 		s.ConfigStores = append(s.ConfigStores, configController)
-	} else {
+	} else { // yes, we are here
 		configController, err := s.makeKubeConfigController(args)
 		if err != nil {
 			return err
 		}
 		s.ConfigStores = append(s.ConfigStores, configController)
-		if features.EnableServiceApis {
+		if features.EnableServiceApis { // false here
 			s.ConfigStores = append(s.ConfigStores, gateway.NewController(s.kubeClient, configController))
 		}
-		if features.EnableAnalysis {
+		if features.EnableAnalysis { // false here
 			if err := s.initInprocessAnalysisController(args); err != nil {
 				return err
 			}
 		}
-		if features.EnableStatus {
+		if features.EnableStatus { // false here
 			s.initStatusController(args)
 		}
 	}
@@ -383,7 +383,7 @@ func (s *Server) makeKubeConfigController(args *PilotArgs) (model.ConfigStoreCac
 	// TODO(howardjohn) allow the collection here to be configurable to allow running with only
 	// Kubernetes APIs.
 	schemas := collection.NewSchemasBuilder()
-	if features.EnableServiceApis {
+	if features.EnableServiceApis { // false, dont enable service apis
 		schemas = schemas.
 			MustAdd(collections.K8SServiceApisV1Alpha1Tcproutes).
 			MustAdd(collections.K8SServiceApisV1Alpha1Gatewayclasses).

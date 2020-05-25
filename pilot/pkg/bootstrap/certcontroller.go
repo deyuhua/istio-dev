@@ -61,7 +61,7 @@ func (s *Server) initCertController(args *PilotArgs) error {
 	var err error
 	var secretNames, dnsNames, namespaces []string
 
-	meshConfig := s.environment.Mesh()
+	meshConfig := s.environment.Mesh() // 没有指定证书，跳过该步骤
 	if meshConfig.GetCertificates() == nil || len(meshConfig.GetCertificates()) == 0 {
 		// TODO: if the provider is set to Citadel, use that instead of k8s so the API is still preserved.
 		log.Info("No certificates specified, skipping K8S DNS certificate controller")

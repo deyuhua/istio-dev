@@ -418,17 +418,17 @@ func (s *Server) createIstioCA(client corev1.CoreV1Interface, opts *CAOptions) (
 		maxCertTTL = SelfSignedCACertTTL.Get()
 	}
 
-	signingKeyFile := path.Join(LocalCertDir.Get(), "ca-key.pem")
+	signingKeyFile := path.Join(LocalCertDir.Get(), "ca-key.pem") //"etc/cacerts/ca-key.pem
 
 	// If not found, will default to ca-cert.pem. May contain multiple roots.
-	rootCertFile := path.Join(LocalCertDir.Get(), "root-cert.pem")
+	rootCertFile := path.Join(LocalCertDir.Get(), "root-cert.pem") // "etc/cacerts/root-cert.pem"
 	if _, err := os.Stat(rootCertFile); err != nil {
 		// In Citadel, normal self-signed doesn't use a root-cert.pem file for additional roots.
 		// In Istiod, it is possible to provide one via "cacerts" secret in both cases, for consistency.
 		rootCertFile = ""
 	}
 
-	if _, err := os.Stat(signingKeyFile); err != nil {
+	if _, err := os.Stat(signingKeyFile); err != nil { // hit this
 		// The user-provided certs are missing - create a self-signed cert.
 		// If we are not in K8S - no CA
 		// TODO: generate self-signed files in the /etc/cacert for non-k8s

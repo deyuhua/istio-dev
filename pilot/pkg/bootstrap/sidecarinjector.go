@@ -31,7 +31,7 @@ const (
 )
 
 func (s *Server) initSidecarInjector(args *PilotArgs) (*inject.Webhook, error) {
-	injectPath := args.InjectionOptions.InjectionDirectory
+	injectPath := args.InjectionOptions.InjectionDirectory // "./var/lib/istio/inject"
 	if injectPath == "" {
 		log.Infof("Skipping sidecar injector, injection path is missing")
 		return nil, nil

@@ -233,11 +233,11 @@ func NewController(client kubernetes.Interface, metadataClient metadata.Interfac
 
 	// The queue requires a time duration for a retry delay after a handler error
 	c := &Controller{
-		domainSuffix:                 options.DomainSuffix,
+		domainSuffix:                 options.DomainSuffix, // cluster.local
 		client:                       client,
 		metadataClient:               metadataClient,
 		queue:                        queue.NewQueue(1 * time.Second),
-		clusterID:                    options.ClusterID,
+		clusterID:                    options.ClusterID, // "Kubernetes"
 		xdsUpdater:                   options.XDSUpdater,
 		servicesMap:                  make(map[host.Name]*model.Service),
 		nodeSelectorsForServices:     make(map[host.Name]labels.Instance),
@@ -262,10 +262,10 @@ func NewController(client kubernetes.Interface, metadataClient metadata.Interfac
 	c.serviceInformer = cache.NewSharedIndexInformer(svcMlw, &v1.Service{}, options.ResyncPeriod,
 		cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
 	c.serviceLister = listerv1.NewServiceLister(c.serviceInformer.GetIndexer())
-	registerHandlers(c.serviceInformer, c.queue, "Services", c.onServiceEvent)
+	registerHandlers(c.serviceInformer, c.queue, "Services", c.onServiceEvent) // NOTE
 
 	switch options.EndpointMode {
-	case EndpointsOnly:
+	case EndpointsOnly: // hit this
 		c.endpoints = newEndpointsController(c, options)
 	case EndpointSliceOnly:
 		c.endpoints = newEndpointSliceController(c, options)
@@ -279,10 +279,10 @@ func NewController(client kubernetes.Interface, metadataClient metadata.Interfac
 	c.filteredNodeInformer = coreinformers.NewFilteredNodeInformer(client, options.ResyncPeriod,
 		cache.Indexers{},
 		func(options *metav1.ListOptions) {})
-	registerHandlers(c.filteredNodeInformer, c.queue, "Nodes", c.onNodeEvent)
+	registerHandlers(c.filteredNodeInformer, c.queue, "Nodes", c.onNodeEvent) // NOTE
 
 	c.pods = newPodCache(c, options)
-	registerHandlers(c.pods.informer, c.queue, "Pods", c.pods.onEvent)
+	registerHandlers(c.pods.informer, c.queue, "Pods", c.pods.onEvent) // NOTE
 
 	return c
 }

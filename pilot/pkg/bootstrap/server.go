@@ -728,7 +728,7 @@ func (s *Server) initRegistryEventHandlers() error {
 	for _, registry := range s.ServiceController().GetRegistries() {
 		// Skip kubernetes and external registries as they are handled separately
 		if registry.Provider() == serviceregistry.Kubernetes ||
-			registry.Provider() == serviceregistry.External {
+			registry.Provider() == serviceregistry.External { // hit this
 			continue
 		}
 		if err := registry.AppendInstanceHandler(instanceHandler); err != nil {
@@ -973,7 +973,7 @@ func (s *Server) initJwtPolicy() {
 	switch features.JwtPolicy.Get() {
 	case jwt.PolicyThirdParty:
 		s.jwtPath = ThirdPartyJWTPath
-	case jwt.PolicyFirstParty:
+	case jwt.PolicyFirstParty: // hit this
 		s.jwtPath = securityModel.K8sSAJwtFileName
 	default:
 		log.Infof("unknown JWT policy %v, default to certificates ", features.JwtPolicy.Get())
@@ -983,7 +983,7 @@ func (s *Server) initJwtPolicy() {
 // maybeCreateCA creates and initializes CA Key if needed.
 func (s *Server) maybeCreateCA(caOpts *CAOptions) error {
 	// CA signing certificate must be created only if CA is enabled.
-	if s.EnableCA() {
+	if s.EnableCA() { // ture here
 		var err error
 		var corev1 v1.CoreV1Interface
 		if s.kubeClient != nil {

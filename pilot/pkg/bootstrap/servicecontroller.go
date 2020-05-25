@@ -39,7 +39,7 @@ func (s *Server) initServiceControllers(args *PilotArgs) error {
 	serviceControllers := s.ServiceController()
 	registered := make(map[serviceregistry.ProviderID]bool)
 	for _, r := range args.Service.Registries {
-		serviceRegistry := serviceregistry.ProviderID(r)
+		serviceRegistry := serviceregistry.ProviderID(r) //"Kubernetes"
 		if _, exists := registered[serviceRegistry]; exists {
 			log.Warnf("%s registry specified multiple times.", r)
 			continue
@@ -47,7 +47,7 @@ func (s *Server) initServiceControllers(args *PilotArgs) error {
 		registered[serviceRegistry] = true
 		log.Infof("Adding %s registry adapter", serviceRegistry)
 		switch serviceRegistry {
-		case serviceregistry.Kubernetes:
+		case serviceregistry.Kubernetes: // hit this branch
 			if err := s.initKubeRegistry(serviceControllers, args); err != nil {
 				return err
 			}
@@ -65,12 +65,12 @@ func (s *Server) initServiceControllers(args *PilotArgs) error {
 	s.serviceEntryStore = serviceentry.NewServiceDiscovery(s.configController, s.environment.IstioConfigStore, s.EnvoyXdsServer)
 	serviceControllers.AddRegistry(s.serviceEntryStore)
 
-	if features.EnableServiceEntrySelectPods && s.kubeRegistry != nil {
+	if features.EnableServiceEntrySelectPods && s.kubeRegistry != nil { // true here
 		// Add an instance handler in the kubernetes registry to notify service entry store about pod events
 		_ = s.kubeRegistry.AppendInstanceHandler(s.serviceEntryStore.ForeignServiceInstanceHandler)
 	}
 
-	if features.EnableK8SServiceSelectWorkloadEntries && s.kubeRegistry != nil {
+	if features.EnableK8SServiceSelectWorkloadEntries && s.kubeRegistry != nil { // true here
 		// Add an instance handler in the service entry store to notify kubernetes about workload entry events
 		_ = s.serviceEntryStore.AppendInstanceHandler(s.kubeRegistry.ForeignServiceInstanceHandler)
 	}
@@ -86,11 +86,11 @@ func (s *Server) initServiceControllers(args *PilotArgs) error {
 
 // initKubeRegistry creates all the k8s service controllers under this pilot
 func (s *Server) initKubeRegistry(serviceControllers *aggregate.Controller, args *PilotArgs) (err error) {
-	args.Config.ControllerOptions.ClusterID = s.clusterID
+	args.Config.ControllerOptions.ClusterID = s.clusterID // "Kubernetes"
 	args.Config.ControllerOptions.Metrics = s.environment
 	args.Config.ControllerOptions.XDSUpdater = s.EnvoyXdsServer
 	args.Config.ControllerOptions.NetworksWatcher = s.environment.NetworksWatcher
-	if features.EnableEndpointSliceController {
+	if features.EnableEndpointSliceController { // false
 		args.Config.ControllerOptions.EndpointMode = kubecontroller.EndpointSliceOnly
 	} else {
 		args.Config.ControllerOptions.EndpointMode = kubecontroller.EndpointsOnly

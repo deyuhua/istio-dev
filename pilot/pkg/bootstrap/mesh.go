@@ -39,18 +39,53 @@ func (s *Server) initMeshConfiguration(args *PilotArgs, fileWatcher filewatcher.
 	}()
 
 	// If a config file was specified, use it.
+	// MeshConfig is nil
 	if args.MeshConfig != nil {
 		s.environment.Watcher = mesh.NewFixedWatcher(args.MeshConfig)
 		return
 	}
 
 	var err error
+	// args.Mesh.ConfigFile: /etc/istio/config/mesh
+	// accessLogEncoding: TEXT
+	// accessLogFile: ""
+	// accessLogFormat: ""
+	// defaultConfig:
+	//   concurrency: 2
+	//   configPath: ./etc/istio/proxy
+	//   connectTimeout: 10s
+	//   controlPlaneAuthPolicy: NONE
+	//   discoveryAddress: istiod.istio-system.svc:15012
+	//   drainDuration: 45s
+	//   parentShutdownDuration: 1m0s
+	//   proxyAdminPort: 15000
+	//   proxyMetadata:
+	//     DNS_AGENT: ""
+	//   serviceCluster: istio-proxy
+	//   tracing:
+	//     zipkin:
+	//       address: zipkin.istio-system:9411
+	// disableMixerHttpReports: true
+	// disablePolicyChecks: true
+	// enablePrometheusMerge: false
+	// ingressClass: istio
+	// ingressControllerMode: STRICT
+	// ingressService: istio-ingressgateway
+	// protocolDetectionTimeout: 100ms
+	// reportBatchMaxEntries: 100
+	// reportBatchMaxTime: 1s
+	// sdsUdsPath: unix:/etc/istio/proxy/SDS
+	// trustDomain: cluster.local
+
+	// 监控mesh文件的变化，监听前先获取默认配置参数，并且校验是否合法
 	s.environment.Watcher, err = mesh.NewWatcher(fileWatcher, args.Mesh.ConfigFile)
+	// 上述步骤无错误，立即返回
 	if err == nil {
 		return
 	}
 
 	// Config file either wasn't specified or failed to load - use a default mesh.
+	// 否则使用系统默认的mesh的配置参数
 	mc := mesh.DefaultMeshConfig()
 	meshConfig := &mc
 
